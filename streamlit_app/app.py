@@ -38,15 +38,12 @@ if uploaded_file or camera:
 
         st.write("Tamanho da imagem:", image_array.shape)
 
-        if model is not None:
-            with tf.compat.v1.Session() as sess:
-                tf.compat.v1.keras.backend.set_session(sess)
-                prediction = model.predict(image_array, batch_size=1)[0][0]
+        prediction = model.predict(image_array, batch_size=1)[0][0]
 
-            if prediction is not None:
-                result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
-                st.image(image, caption=f"Classificação: {result}, Pontuação de vivacidade: {prediction * 100:.2f}%")
-            else:
-                st.error("A predição falhou.")
+        if prediction is not None:
+            result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
+            st.image(image, caption=f"Classificação: {result}, Pontuação de vivacidade: {prediction * 100:.2f}%")
         else:
-            st.error("O modelo não foi carregado corretamente.")
+            st.error("A predição falhou.")
+else:
+    st.info("Por favor, carregue uma imagem ou capture uma foto usando a webcam.")
