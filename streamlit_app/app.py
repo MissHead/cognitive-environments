@@ -4,7 +4,7 @@ from PIL import Image
 import tensorflow as tf
 import io
 
-model_path = 'streamlit_app/models/model.h5'
+model_path = 'streamlit_app/model.h5'
 model = tf.keras.models.load_model(model_path)
 
 st.title('Cognitive Environments - Detecção de Vivacidade')
