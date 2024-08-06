@@ -1,0 +1,9 @@
+[server]
+headless = true
+maxUploadSize = 200
+
+[client]
+caching = false
+
+[global]
+logLevel = "debug"

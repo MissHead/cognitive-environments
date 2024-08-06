@@ -4,7 +4,12 @@ from PIL import Image
 import tensorflow as tf
 
 model_path = 'streamlit_app/model.h5'
-model = tf.keras.models.load_model(model_path)
+try:
+    model = tf.keras.models.load_model(model_path)
+    model_loaded = True
+except Exception as e:
+    st.error(f"Erro ao carregar o modelo: {e}")
+    model_loaded = False
 
 st.title('Cognitive Environments - Detecção de Vivacidade')
 
@@ -19,7 +24,7 @@ if option == 'Carregar Imagem':
 else:
     uploaded_file = capture_image()
 
-if uploaded_file is not None:
+if uploaded_file is not None and model_loaded:
     try:
         image = Image.open(uploaded_file)
         st.image(image, caption='Imagem carregada.', use_column_width=True)
@@ -30,7 +35,7 @@ if uploaded_file is not None:
         
         st.write("Tamanho da imagem:", image_array.shape)
         
-        prediction = model.predict(image_array)[0][0]
+        prediction = model.predict(image_array, batch_size=1)[0][0]
         
         result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
         st.write(f"Resultado da detecção: {result}")
