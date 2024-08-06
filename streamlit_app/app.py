@@ -24,26 +24,31 @@ else:
     camera = capture_image()
 
 if uploaded_file or camera:
-    if uploaded_file is not None:
-        img_stream = io.BytesIO(uploaded_file.getvalue())
-        image = Image.open(img_stream).convert("RGB")
-    elif camera is not None:
-        bytes_data = camera.getvalue()
-        image = Image.open(io.BytesIO(bytes_data)).convert("RGB")
+    try:
+        if uploaded_file is not None:
+            img_stream = io.BytesIO(uploaded_file.getvalue())
+            image = Image.open(img_stream).convert("RGB")
+        elif camera is not None:
+            bytes_data = camera.getvalue()
+            image = Image.open(io.BytesIO(bytes_data)).convert("RGB")
 
-    with st.spinner("Classificando imagem..."):
-        image = image.resize((128, 128))
-        image_array = np.array(image) / 255.0
-        image_array = np.expand_dims(image_array, axis=0)
+        with st.spinner("Classificando imagem..."):
+            image = image.resize((128, 128))
+            image_array = np.array(image) / 255.0
+            image_array = np.expand_dims(image_array, axis=0)
 
-        st.write("Tamanho da imagem:", image_array.shape)
+            st.write("Tamanho da imagem:", image_array.shape)
 
-        prediction = model.predict(image_array, batch_size=1)[0][0]
+            prediction = model.predict(image_array, batch_size=1)[0][0]
 
-        if prediction is not None:
-            result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
-            st.image(image, caption=f"Classificação: {result}, Pontuação de vivacidade: {prediction * 100:.2f}%")
-        else:
-            st.error("A predição falhou.")
+            if prediction is not None:
+                result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
+                st.image(image, caption=f"Classificação: {result}, Pontuação de vivacidade: {prediction * 100:.2f}%")
+            else:
+                st.error("A predição falhou.")
+    except BrokenPipeError as e:
+        st.error(f"Erro de pipeline quebrada: {e}")
+    except Exception as e:
+        st.error(f"Ocorreu um erro: {e}")
 else:
     st.info("Por favor, carregue uma imagem ou capture uma foto usando a webcam.")
