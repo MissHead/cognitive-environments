@@ -32,26 +32,16 @@ if uploaded_file or camera:
         image = Image.open(io.BytesIO(bytes_data)).convert("RGB")
 
     with st.spinner("Classificando imagem..."):
-        try:
-            image = image.resize((128, 128))
-            image_array = np.array(image) / 255.0
-            image_array = np.expand_dims(image_array, axis=0)
+        image = image.resize((128, 128))
+        image_array = np.array(image) / 255.0
+        image_array = np.expand_dims(image_array, axis=0)
 
-            st.write("Tamanho da imagem:", image_array.shape)
+        st.write("Tamanho da imagem:", image_array.shape)
 
-            if model is not None:
-                try:
-                    prediction = model.predict(image_array, batch_size=1)[0][0]
-                except Exception as e:
-                    st.error(f"Ocorreu um erro durante a predição: {e}")
-                    prediction = None
+        if model is not None:
+            prediction = model.predict(image_array, batch_size=1)[0][0]
 
-                if prediction is not None:
-                    result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
-                    st.image(image, caption=f"Classificação: {result}, Pontuação de vivacidade: {prediction * 100:.2f}%")
-                else:
-                    st.error("A predição falhou.")
-            else:
-                st.error("O modelo não foi carregado corretamente.")
-        except Exception as e:
-            st.error(f"Ocorreu um erro durante o processamento da imagem: {e}")
+            result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
+            st.image(image, caption=f"Classificação: {result}, Pontuação de vivacidade: {prediction * 100:.2f}%")
+        else:
+            st.error("Erro.")
