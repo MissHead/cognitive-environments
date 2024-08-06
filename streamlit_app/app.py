@@ -3,13 +3,17 @@ import numpy as np
 from PIL import Image
 import tensorflow as tf
 
-model_path = 'streamlit_app/model.h5'
-try:
-    model = tf.keras.models.load_model(model_path)
-    model_loaded = True
-except Exception as e:
-    st.error(f"Erro ao carregar o modelo: {e}")
-    model_loaded = False
+@st.cache_resource
+def load_model():
+    model_path = 'streamlit_app/model.h5'
+    try:
+        model = tf.keras.models.load_model(model_path)
+        return model
+    except Exception as e:
+        st.error(f"Erro ao carregar o modelo: {e}")
+        return None
+
+model = load_model()
 
 st.title('Cognitive Environments - Detecção de Vivacidade')
 
@@ -24,7 +28,7 @@ if option == 'Carregar Imagem':
 else:
     uploaded_file = capture_image()
 
-if uploaded_file is not None and model_loaded:
+if uploaded_file is not None and model is not None:
     try:
         image = Image.open(uploaded_file)
         st.image(image, caption='Imagem carregada.', use_column_width=True)
