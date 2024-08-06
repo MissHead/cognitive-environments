@@ -4,16 +4,8 @@ from PIL import Image
 import tensorflow as tf
 import io
 
-def load_model():
-    model_path = 'streamlit_app/model.h5'
-    try:
-        model = tf.keras.models.load_model(model_path)
-        return model
-    except Exception as e:
-        st.error(f"Erro ao carregar o modelo: {e}")
-        return None
 
-model = load_model()
+model = tf.keras.models.load_model('streamlit_app/model.h5')
 
 st.title('Cognitive Environments - Detecção de Vivacidade')
 
