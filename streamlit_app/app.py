@@ -4,8 +4,17 @@ from PIL import Image
 import tensorflow as tf
 import io
 
+@st.cache_resource
+def load_model():
+    model_path = 'streamlit_app/model.h5'
+    try:
+        model = tf.keras.models.load_model(model_path)
+        return model
+    except Exception as e:
+        st.error(f"Erro ao carregar o modelo: {e}")
+        return None
 
-model = tf.keras.models.load_model('streamlit_app/model.h5')
+model = load_model()
 
 st.title('Cognitive Environments - Detecção de Vivacidade')
 
@@ -32,11 +41,23 @@ if uploaded_file or camera:
         image = Image.open(io.BytesIO(bytes_data)).convert("RGB")
 
     with st.spinner("Classificando imagem..."):
-        image = image.resize((128, 128))
-        image_array = np.array(image) / 255.0
-        image_array = np.expand_dims(image_array, axis=0)
+        try:
+            image = image.resize((128, 128))
+            image_array = np.array(image) / 255.0
+            image_array = np.expand_dims(image_array, axis=0)
 
-        prediction = model.predict(image_array, batch_size=1)[0][0]
+            st.write("Tamanho da imagem:", image_array.shape)
 
-        result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
-        st.image(image, caption=f"Classificação: {result}, Pontuação de vivacidade: {prediction * 100:.2f}%")
+            try:
+                prediction = model.predict(image_array, batch_size=1)[0][0]
+            except Exception as e:
+                st.error(f"Ocorreu um erro durante a predição: {e}")
+                prediction = None
+
+            if prediction is not None:
+                result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
+                st.image(image, caption=f"Classificação: {result}, Pontuação de vivacidade: {prediction * 100:.2f}%")
+            else:
+                st.error("A predição falhou.")
+        except Exception as e:
+            st.error(f"Ocorreu um erro durante o processamento da imagem: {e}")
