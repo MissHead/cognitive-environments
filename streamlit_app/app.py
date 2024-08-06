@@ -32,14 +32,11 @@ if uploaded_file or camera:
         image = Image.open(io.BytesIO(bytes_data)).convert("RGB")
 
     with st.spinner("Classificando imagem..."):
-        try:
-            image = image.resize((128, 128))
-            image_array = np.array(image) / 255.0
-            image_array = np.expand_dims(image_array, axis=0)
+        image = image.resize((128, 128))
+        image_array = np.array(image) / 255.0
+        image_array = np.expand_dims(image_array, axis=0)
 
-            prediction = model.predict(image_array, batch_size=1)[0][0]
+        prediction = model.predict(image_array, batch_size=1)[0][0]
 
-            result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
-            st.image(image, caption=f"Classificação: {result}, Pontuação de vivacidade: {prediction * 100:.2f}%")
-        except Exception as e:
-            st.error(f"Ocorreu um erro durante a predição: {e}")
+        result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
+        st.image(image, caption=f"Classificação: {result}, Pontuação de vivacidade: {prediction * 100:.2f}%")
