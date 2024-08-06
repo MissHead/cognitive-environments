@@ -3,6 +3,9 @@ import numpy as np
 from PIL import Image
 import tensorflow as tf
 import io
+import os
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 model_path = 'streamlit_app/model.h5'
 model = tf.keras.models.load_model(model_path)
@@ -19,7 +22,7 @@ uploaded_file = None
 camera = None
 
 if option == 'Carregar Imagem':
-    uploaded_file = st.file_uploader("Escolha uma imagem...", type="jpg")
+    uploaded_file = st.file_uploader("Escolha uma imagem...", type=["jpg", "jpeg"])
 else:
     camera = capture_image()
 
