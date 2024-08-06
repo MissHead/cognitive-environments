@@ -23,14 +23,24 @@ if option == 'Carregar Imagem':
 else:
     camera = capture_image()
 
-if uploaded_file or camera:
-    if uploaded_file is not None:
-        img_stream = io.BytesIO(uploaded_file.getvalue())
-        image = Image.open(img_stream).convert("RGB")
-    elif camera is not None:
-        bytes_data = camera.getvalue()
-        image = Image.open(io.BytesIO(bytes_data)).convert("RGB")
+def process_image(image_file):
+    try:
+        if image_file is not None:
+            img_stream = io.BytesIO(image_file.getvalue())
+            image = Image.open(img_stream).convert("RGB")
+            return image
+    except Exception as e:
+        st.error(f"Erro ao processar a imagem: {e}")
+    return None
 
+image = None
+
+if uploaded_file:
+    image = process_image(uploaded_file)
+elif camera:
+    image = process_image(camera)
+
+if image:
     with st.spinner("Classificando imagem..."):
         image = image.resize((128, 128))
         image_array = np.array(image) / 255.0
