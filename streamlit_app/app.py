@@ -5,7 +5,7 @@ import tensorflow as tf
 import base64
 import io
 
-model = tf.keras.models.load_model('model.h5')
+model = tf.keras.models.load_model('streamlit_app/model.h5')
 
 st.title('Detecção de Vivacidade')
 
