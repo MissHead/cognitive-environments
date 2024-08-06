@@ -4,17 +4,8 @@ from PIL import Image
 import tensorflow as tf
 import io
 
-@st.cache_resource
-def load_model():
-    model_path = 'streamlit_app/model.h5'
-    try:
-        model = tf.keras.models.load_model(model_path)
-        return model
-    except Exception as e:
-        st.error(f"Erro ao carregar o modelo: {e}")
-        return None
-
-model = load_model()
+model_path = 'streamlit_app/models/model.h5'
+model = tf.keras.models.load_model(model_path)
 
 st.title('Cognitive Environments - Detecção de Vivacidade')
 
@@ -48,16 +39,19 @@ if uploaded_file or camera:
 
             st.write("Tamanho da imagem:", image_array.shape)
 
-            try:
-                prediction = model.predict(image_array, batch_size=1)[0][0]
-            except Exception as e:
-                st.error(f"Ocorreu um erro durante a predição: {e}")
-                prediction = None
+            if model is not None:
+                try:
+                    prediction = model.predict(image_array, batch_size=1)[0][0]
+                except Exception as e:
+                    st.error(f"Ocorreu um erro durante a predição: {e}")
+                    prediction = None
 
-            if prediction is not None:
-                result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
-                st.image(image, caption=f"Classificação: {result}, Pontuação de vivacidade: {prediction * 100:.2f}%")
+                if prediction is not None:
+                    result = 'Vivo' if prediction > 0.5 else 'Fraudulento'
+                    st.image(image, caption=f"Classificação: {result}, Pontuação de vivacidade: {prediction * 100:.2f}%")
+                else:
+                    st.error("A predição falhou.")
             else:
-                st.error("A predição falhou.")
+                st.error("O modelo não foi carregado corretamente.")
         except Exception as e:
             st.error(f"Ocorreu um erro durante o processamento da imagem: {e}")
