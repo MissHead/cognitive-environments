@@ -15,12 +15,16 @@ def load_model():
 
 model = load_model()
 
+st.title('Cognitive Environments - Detecção de Vivacidade')
 
 def capture_image():
     picture = st.camera_input("Tire uma foto")
     return picture
 
 option = st.radio("Escolha uma opção:", ('Carregar Imagem', 'Capturar pela Webcam'))
+
+uploaded_file = None
+camera = None
 
 if option == 'Carregar Imagem':
     uploaded_file = st.file_uploader("Escolha uma imagem...", type="jpg")
